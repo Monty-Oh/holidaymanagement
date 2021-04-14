@@ -31,9 +31,6 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
   ],
-  serverMiddleware: [
-    { path: '/store/api', handler: '~/store/api/testDB.js' }
-  ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
@@ -46,10 +43,10 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    extend(config, ctx) {
-      config.node = {
-        fs: 'empty'
-      }
-    }
+    // extend(config, ctx) {
+    //   config.node = {
+    //     fs: 'empty'
+    //   }
+    // }
   }
 }

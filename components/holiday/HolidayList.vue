@@ -21,7 +21,6 @@
 <script>
 import {mapGetters} from "vuex";
 import {CHANGE} from "../../store/holiday";
-
 export default {
   data() {
     return {

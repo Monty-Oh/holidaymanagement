@@ -1,4 +1,4 @@
-import {loadDBJson, writeDBJson} from '../api/testDB';
+import {loadDBJson} from '../api/testDB';
 import {CHANGE_HOLIDAY_LIST} from './mutations';
 
 export const SEARCH = 'SEARCH';
@@ -44,7 +44,7 @@ const actions = {
   },
 
   // checked 된 상태값들에 대해 DB에 삭제 요청을 한다. 성공했을 때 mutations로 넘어감.
-  async [DELETE](context) {
+  [DELETE](context) {
 
     // 1. holidayList에서 check가 true이면서 배송휴일들은 모두 삭제시켜버린다.
     let nextData = context.state.holidayList.filter((holiday) =>
@@ -67,18 +67,18 @@ const actions = {
     * 여기서는 프론트부분에서 처리.
     */
     // db작업을 넘긴다.
-    try {
-      let result = await writeDBJson(nextData, this.$axios);
-
-    } catch (e) {
-      console.log('holiday/DELETE 에러');
-      console.error(e);
-    }
-
+    //   let result = writeDBJson(nextData);
     // jsonDB와 동기화. 다시 SEARCH를 보낸다.
-    context.dispatch({
-      type: SEARCH,
+    context.commit({
+      type: CHANGE_HOLIDAY_LIST,
+      result: nextData,
     });
+
+
+    // } catch (e) {
+    //   console.log('holiday/DELETE 에러');
+    //   console.error(e);
+    // }
   }
 }
 
