@@ -9,6 +9,7 @@
         :altrows="true"
         :editable="true"
         @cellvaluechanged="onChange"
+        @celldoubleclick="onClickRow"
         ref="holidayGrid"
       />
     </client-only>
@@ -21,6 +22,7 @@
 <script>
 import {mapGetters} from "vuex";
 import {CHANGE} from "../../store/holiday";
+
 export default {
   data() {
     return {
@@ -40,16 +42,22 @@ export default {
       columns: [
         {text: 'id', datafield: 'id', hidden: true},
         {text: '체크', columntype: 'checkbox', datafield: 'check', width: 50},
-        {text: '기간', datafield: 'date', width: 150},
-        {text: '휴일명', datafield: 'name', width: 130},
-        {text: '등록자', datafield: 'register', width: 120},
-        {text: '등록일시', datafield: 'regitDate', width: 200},
-        {text: '휴일유형', datafield: 'type', width: 130}
+        {text: '기간', datafield: 'date', width: 150, editable: false},
+        {text: '휴일명', datafield: 'name', width: 130, editable: false},
+        {text: '등록자', datafield: 'register', width: 120, editable: false},
+        {text: '등록일시', datafield: 'regitDate', width: 200, editable: false},
+        {text: '휴일유형', datafield: 'type', width: 130, editable: false}
       ]
     }
   },
 
   methods: {
+    // 행을 클릭했을 때 이벤트. 행에 대한 수정 할 수 있는 창이 뜨게끔 한다. Modal사용
+    onClickRow(e) {
+      console.log(e.args.row.bounddata);
+    },
+
+
     // JpxGrid change 이벤트
     onChange() {
       // ref로 지정해둔 Grid에서 rows를 가져온다.

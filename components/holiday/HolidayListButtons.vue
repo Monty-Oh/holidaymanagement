@@ -13,7 +13,7 @@ import { DELETE } from "../../store/holiday";
 export default {
   data() {
     return {
-      modal: true,
+      modal: false,
     }
   },
   components: {

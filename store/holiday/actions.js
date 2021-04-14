@@ -1,4 +1,4 @@
-import {loadDBJson} from '../api/testDB';
+import {holidayApis} from '~/apis/holiday'
 import {CHANGE_HOLIDAY_LIST} from './mutations';
 
 export const SEARCH = 'SEARCH';
@@ -11,10 +11,10 @@ const actions = {
 
   // SEARCH 버튼을 클릭했을 때. startDate, endDate가 null인지에 따라 달라짐.
   async [SEARCH](context) {
+
     try {
       // 비동기작업!! 작업에 필요한 기능들은 모두 api로 호출
-      let result = await loadDBJson(this.state.search);
-
+      let result = await holidayApis.loadDBJson(this.state.search);
       // 필터링된 result 커밋한다. 화면에 표시될 state.holidayList가 변경된다.
       context.commit({
         type: CHANGE_HOLIDAY_LIST,
@@ -58,7 +58,7 @@ const actions = {
       } :
       holiday
     );
-
+    holidayApis.writeDBJson(nextData).then(r => console.log(r))
     /*
     * 비동기 작업(db 삭제 요청)
     * 일반휴일은 휴일명만 사라지고,

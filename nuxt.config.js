@@ -21,8 +21,8 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    {src: 'plugins/jqwidgets.js', ssr: false}, // Only works on client side
-    // {src: 'plugins/fs.js', ssr: false}
+    {src: '@/plugins/jqwidgets.js', mode: 'client'}, // Only works on client side
+    // '~/plugins/fs.js',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -35,6 +35,7 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
+    // '~/plugins/fs.js',
   ],
   axios: {
     // extra config e.g
@@ -43,10 +44,11 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    // extend(config, ctx) {
-    //   config.node = {
-    //     fs: 'empty'
-    //   }
-    // }
-  }
+    extend(config, ctx) {
+      config.node = {
+        fs: 'empty',
+      }
+    }
+  },
+
 }
