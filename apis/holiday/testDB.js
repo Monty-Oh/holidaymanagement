@@ -1,4 +1,4 @@
-import { filterByDate, filterByType } from "./testDB.lib";
+import { filterByCreatedAt, filterByHoldyTpCd } from "./testDB.lib";
 
 // 가상 DB 서버가 있다는 가정하의 작업들.
 // 쿼리문과 조건을 붙여서 날리면 답이 온다는 가정으로 만듬.
@@ -6,8 +6,8 @@ import { filterByDate, filterByType } from "./testDB.lib";
 export async function loadDBJson({startDate, endDate, normalHoliday, transferHoliday}) {
   // readDB 함수 실행. 비동기 함수
   let result = (await readDB()).holidayList;
-  result = filterByDate(startDate, endDate, result);
-  result = filterByType(normalHoliday, transferHoliday, result);
+  result = filterByCreatedAt(startDate, endDate, result);
+  result = filterByHoldyTpCd(normalHoliday, transferHoliday, result);
   return result;
 }
 

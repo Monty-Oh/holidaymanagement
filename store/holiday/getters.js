@@ -3,13 +3,15 @@ const getters = {
   holidayList: state => {
     return state.holidayList.map((holiday) => {
       return [
-        holiday.id,
         holiday.check ? holiday.check : false,
-        holiday.date,
-        holiday.name,
-        holiday.register,
-        (new Date(holiday.regitDate)),
-        holiday.type,
+        new Date(holiday.begDt),
+        holiday.holdyNm,
+        holiday.createdBy,
+        new Date(holiday.createdAt),
+        holiday.holdyTpCd,
+        holiday.holdySn,
+        holiday.lastModifiedAt,
+        holiday.lastModifiedBy,
       ]
     });
   },

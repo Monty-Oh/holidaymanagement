@@ -18,22 +18,23 @@
               </div>
               <div>
                 <div>
-                  기간 : <input v-model='date' type="date">
+                  기간 : <input v-model='inputBegDt' type="date">
                 </div>
                 <div>
                   휴일 유형 :
-                  <div class="modal-radio">
-                    <input type="checkbox" checked="checked" disabled="disabled">
-                    일반휴일
-                  </div>
-                  <div class="modal-radio">
-                    <input v-model="isTransfer" type="checkbox">
-                    배송휴일
-                  </div>
+                  <input class="modal-radio" type="radio" id="normal" value="일반휴일" v-model="inputHoldyTpCd">
+                  <label for="normal">일반휴일</label>
+                  <input class="modal-radio" type="radio" id="delivery" value="배송휴일" v-model="inputHoldyTpCd">
+                  <label for="delivery">배송휴일</label>
                 </div>
-                휴일명 : <input class="input-name" v-bind:date="date" @change="onChangeTextArea">
+                <!-- 한글 입력 시 v-model 경우 입력문제가 발생하기에, v-bind와 v-on:change를 같이 쓰기를 권장함. -->
+                휴일명 :
+                <textarea
+                  class="textarea-holdy-nm"
+                  :inputHoldyNm="inputHoldyNm"
+                  @change="onChangeTextArea"
+                ></textarea>
               </div>
-
             </slot>
           </div>
 
@@ -42,7 +43,7 @@
               <button class="modal-default-button" @click="onClickCloseModal">
                 닫기
               </button>
-              <button class="modal-default-button" @click="onClickCloseModal">
+              <button class="modal-default-button" @click="onClickSaveButton">
                 저장
               </button>
 
@@ -55,30 +56,70 @@
 </template>
 
 <script>
+import {ADD_HOLDY} from "../../store/holiday";
+
 export default {
+  // 휴일에 대한 정보를 props로 받아오는 경우, 휴일을 수정하는 경우
+  // 휴일에 대한 정보를 받아오지 않는 경우, 휴일을 새로 생성하는 경우
+  // props: ['inputBegDt'],
   data() {
     return {
-      date: null,
-      isNormal: true,
-      isTransfer: false,
-      name: '',
+      inputBegDt: null,
+      inputCreatedAt: null,
+      inputHoldyTpCd: '일반휴일',
+      inputHoldyNm: '',
+
+      // 화면상에 출력할 날짜. modal에서만 쓰임.
+      todayDate: '',
     }
   },
   methods: {
+    // modal 닫는 이벤트
     onClickCloseModal() {
       this.$emit('onClickCloseModal');
     },
+
+    // textArea 변경 이벤트
     onChangeTextArea(e) {
-      this.name = e.target.value;
-      console.log(this.name);
+      this.inputHoldyNm = e.target.value;
+    },
+
+    // 저장 클릭 시 이벤트 발생. 입력값이 제대로 들어와 있는지 검사한다.
+    // 만약 일반휴일이 지정되어있지 않은 날짜에 배송휴일을 저장하려하면 alert 뜨게 해야함.
+    async onClickSaveButton() {
+      if(this.inputBegDt === null || this.inputHoldyNm === '') alert('입력하지 않은 칸이 있습니다!');
+      // 스토어 액션으로 new date(등록일), begDt, holdyNm, holdyTpCd, 넘긴다.
+      else {
+        try {
+          const result = await this.$store.dispatch({
+            type: ADD_HOLDY,
+            createdAt: new Date(),
+            begDt: this.inputBegDt,
+            holdyNm: this.inputHoldyNm,
+            holdyTpCd: this.inputHoldyTpCd,
+          });
+          if(result === 'normalAlreadyExist' ||
+            result === 'deliverAlreadyExist' ||
+            result === 'normalNotExist') alert(result);
+          else this.onClickCloseModal();
+        } catch(e) {
+          console.log('Modal.vue - onClickSaveButton() 에러')
+          console.error(e);
+        }
+      }
     }
   },
   computed: {
-    todayDate() {
-      const date = new Date();
-      const result = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-      return result;
-    }
+    // createdAt() {
+    //   const date = new Date();
+    //   const result = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    //
+    //   return result;
+    // }
+  },
+  created(){
+    const date = new Date();
+    this.todayDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
   }
 }
 </script>
@@ -126,6 +167,11 @@ export default {
 
 .modal-radio {
   margin-left: 1rem;
+}
+
+.textarea-holdy-nm {
+  width: 100%;
+
 }
 
 /*

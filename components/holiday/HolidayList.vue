@@ -7,6 +7,8 @@
         :columns="columns"
         :pageable="true"
         :altrows="true"
+        :pageSize="5"
+        :autoHeight="true"
         :editable="true"
         @cellvaluechanged="onChange"
         @celldoubleclick="onClickRow"
@@ -40,13 +42,16 @@ export default {
       }),
       // 테이블에 대한 정보
       columns: [
-        {text: 'id', datafield: 'id', hidden: true},
         {text: '체크', columntype: 'checkbox', datafield: 'check', width: 50},
-        {text: '기간', datafield: 'date', width: 150, editable: false},
-        {text: '휴일명', datafield: 'name', width: 130, editable: false},
-        {text: '등록자', datafield: 'register', width: 120, editable: false},
-        {text: '등록일시', datafield: 'regitDate', width: 200, editable: false},
-        {text: '휴일유형', datafield: 'type', width: 130, editable: false}
+        {text: '기간', datafield: 'begDt', width: 150, editable: false, cellsformat: 'yyyy-MM-dd'},
+        {text: '휴일명', datafield: 'holdyNm', width: 130, editable: false},
+        {text: '등록자', datafield: 'createdBy', width: 120, editable: false},
+        {text: '등록일시', datafield: 'createdAt', width: 200, editable: false, cellsformat: 'yyyy-MM-dd hh:mm'},
+        {text: '휴일유형', datafield: 'holdyTpCd', width: 130, editable: false},
+        // 숨겨진 값들
+        {datafield: 'holdySn', hidden: true},
+        {datafield: 'lastModifiedAt', hidden: true},
+        {datafield: 'lastModifiedBy', hidden: true},
       ]
     }
   },
@@ -56,7 +61,6 @@ export default {
     onClickRow(e) {
       console.log(e.args.row.bounddata);
     },
-
 
     // JpxGrid change 이벤트
     onChange() {
@@ -68,7 +72,6 @@ export default {
         type: CHANGE,
         values: rows,
       })
-
       /*
       * 체크된 rows만을 찾아서 바꾼다 -> 탐색에 대한 시간이 걸림
       * 그냥 전부다 교체해버린다 -> 탐색에 대한 시간이 걸리지 않지만,
@@ -96,20 +99,23 @@ export default {
   watch: {
     // holidayList에 대한 변화가 감지된다면, methods의 reBindData 메소드가 실행된다.
     holidayList: 'reBindData',
-    source: 'test',
   },
 
   beforeCreate() {
     this.source = {
       localdata: [],
       datafields: [
-        {name: 'id', type: 'number', map: '0'},
-        {name: 'check', type: "bool", map: '1'},
-        {name: 'date', type: 'string', map: '2'},
-        {name: 'name', type: 'string', map: '3'},
-        {name: 'register', type: 'string', map: '4'},
-        {name: 'regitDate', type: 'string', map: '5'},
-        {name: 'type', type: 'string', map: '6'}
+        {name: 'check', type: "bool", map: '0'},
+        {name: 'begDt', type: 'date', map: '1'},
+        {name: 'holdyNm', type: 'string', map: '2'},
+        {name: 'createdBy', type: 'string', map: '3'},
+        {name: 'createdAt', type: 'date', map: '4'},
+        {name: 'holdyTpCd', type: 'string', map: '5'},
+
+        // 숨겨진 값들
+        {name: 'holdySn', type: 'number', map: '6'},
+        {name: 'lastModifiedAt', type: 'date', map: '7'},
+        {name: 'lastModifiedBy', type: 'string', map: '8'},
       ],
       datatype: 'array'
     };

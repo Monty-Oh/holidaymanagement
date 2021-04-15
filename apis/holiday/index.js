@@ -1,1 +1,5 @@
-export * as holidayApis from './testDB';
+import {loadDBJson, writeDBJson} from './testDB';
+export {
+  loadDBJson,
+  writeDBJson,
+}
