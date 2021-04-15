@@ -6,7 +6,7 @@
      <holiday-header></holiday-header>
      <holiday-search></holiday-search>
 <!--     <holiday-search-buttons></holiday-search-buttons>-->
-     <holiday-list-buttons></holiday-list-buttons>
+<!--     <holiday-list-buttons></holiday-list-buttons>-->
      <holiday-list></holiday-list>
    </client-only>
  </div>

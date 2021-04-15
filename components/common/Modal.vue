@@ -87,37 +87,28 @@ export default {
     // 저장 클릭 시 이벤트 발생. 입력값이 제대로 들어와 있는지 검사한다.
     // 만약 일반휴일이 지정되어있지 않은 날짜에 배송휴일을 저장하려하면 alert 뜨게 해야함.
     async onClickSaveButton() {
-      if(this.inputBegDt === null || this.inputHoldyNm === '') alert('입력하지 않은 칸이 있습니다!');
+      if (this.inputBegDt === null || this.inputHoldyNm === '') alert('입력하지 않은 칸이 있습니다!');
       // 스토어 액션으로 new date(등록일), begDt, holdyNm, holdyTpCd, 넘긴다.
       else {
         try {
-          const result = await this.$store.dispatch({
-            type: ADD_HOLDY,
-            createdAt: new Date(),
-            begDt: this.inputBegDt,
-            holdyNm: this.inputHoldyNm,
-            holdyTpCd: this.inputHoldyTpCd,
-          });
-          if(result === 'normalAlreadyExist' ||
-            result === 'deliverAlreadyExist' ||
-            result === 'normalNotExist') alert(result);
+          const [error, message] =
+            await this.$store.dispatch({
+              type: ADD_HOLDY,
+              createdAt: new Date(),
+              begDt: this.inputBegDt,
+              holdyNm: this.inputHoldyNm,
+              holdyTpCd: this.inputHoldyTpCd,
+            });
+          if (error) alert(message);
           else this.onClickCloseModal();
-        } catch(e) {
+        } catch (e) {
           console.log('Modal.vue - onClickSaveButton() 에러')
           console.error(e);
         }
       }
     }
   },
-  computed: {
-    // createdAt() {
-    //   const date = new Date();
-    //   const result = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    //
-    //   return result;
-    // }
-  },
-  created(){
+  created() {
     const date = new Date();
     this.todayDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
   }

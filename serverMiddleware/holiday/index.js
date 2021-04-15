@@ -1,12 +1,11 @@
 import express from 'express';
-import {AddHoldy} from './testDB.lib';
+import {AddHoldy} from './holiday.lib';
 
 const fs = require('fs');
 const router = express.Router();
 const app = express();
 
-// backend 영역
-
+// test용 백엔드 코드.
 router.use((req, res, next) => {
   Object.setPrototypeOf(req, app.request);
   Object.setPrototypeOf(res, app.response);
@@ -25,46 +24,47 @@ router.post('/holdy', async (req, res) => {
 
   // '/apis/holdy'로 리다이렉트. 결과값으로 다시 새로운 DB가 반환됨.
   res.redirect('/apis/holdy')
-  // await fs.readFile('testDB.json', (err, data) => {
-  //   if (err) console.log(err);
-  //   return res.send(JSON.parse(data))
-  // });
 });
 
 // get data and send(data)
 router.get('/holdy', async (req, res) => {
-  await fs.readFile('testDB.json', (err, data) => {
-    if (err) console.log(err);
+  try {
+    const data = await fs.readFileSync('testDB.json');
     return res.send(JSON.parse(data))
-  });
+  } catch (e) {
+    console.error(e);
+  }
 })
 
 // 새로운 요소 생성
 router.post('/holdy/item', async (req, res) => {
-  await fs.readFile('testDB.json', async (err, data) => {
-    if (err) console.log(err);
-    const nextData = (JSON.parse(data)).holidayList.map((holiday) => {
-      return {
-        ...holiday,
-      }
-    });
+  try {
+    const data = await fs.readFileSync('testDB.json');
+    const holidayList = [...(JSON.parse(data)).holidayList]
 
     // 이미 있는 데이터를 검사하고 호출.
-    const result = AddHoldy(nextData, req.body.data);
-    if (result[0] === 'normalAlreadyExist' ||
-      result[0] === 'deliverAlreadyExist' ||
-      result[0] === 'normalNotExist') {
-      // res.data = result[0];
+    const result = AddHoldy(holidayList, req.body.data);
+
+    // 결과값에 따라 분기 202는 DB 검사 결과 부적합
+    if (result[0] === 202) {
       res.status(202);
-      res.send(result[0]);
-    } else {
-      const nextData = JSON.stringify({holidayList: result})
-      await fs.writeFileSync('testDB.json', nextData, (err) => {
-        if (err) console.log(err);
+      res.send(result[1]);
+    }
+    // 새롭게 받은 배열로 파일에 덮어 씌움.
+    else {
+      // const nextData = JSON.stringify({holidayList: result})
+      await fs.writeFileSync('testDB.json', JSON.stringify({holidayList: result}), (err) => {
+        if (err) console.error(err);
       });
+
+      // 다시 새롭게 만들어진 json파일 출력
       res.redirect('/apis/holdy');
     }
-  });
+  } catch (e) {
+    console.error(e);
+    res.status(304);
+    res.send(e);
+  }
 });
 
 

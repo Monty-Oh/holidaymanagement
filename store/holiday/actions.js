@@ -100,25 +100,29 @@ const actions = {
   // 휴일 생성 이벤트 발생.
   async [ADD_HOLDY](context, { begDt, holdyTpCd, holdyNm, createdAt }) {
     // holdyTpCd가 일반휴일이면 이미 있는지 체크(일반휴일 or ''), 배송휴일이면 이미 일반휴일이 있는지 체크.
-    console.log();
-    const result = await this.$axios.post('/apis/holdy/item', {
-      data: {
-        begDt: new Date(begDt),
-        holdyTpCd,
-        holdyNm,
-        createdAt,
-        createdBy: 'monty_addTest'
+    try {
+      const result = await this.$axios.post('/apis/holdy/item', {
+        data: {
+          begDt: new Date(begDt),
+          holdyTpCd,
+          holdyNm,
+          createdAt,
+          createdBy: 'monty_addTest'
+        }
+      })
+      // 이미 일반 배송 휴일이 있을 때.
+      if(result.status === 202)
+        return [true, result.data];
+      else {
+        context.commit({
+          type: CHANGE_HOLIDAY_LIST,
+          result: result.data.holidayList,
+        });
+        return [false];
       }
-    })
-  console.log(result);
-    // 이미 일반 배송 휴일이 있을 때.
-    if(result.status === 202)
-      return result.data;
-    else {
-      context.commit({
-        type: CHANGE_HOLIDAY_LIST,
-        result: result.data.holidayList,
-      });
+    } catch (e) {
+      console.log('vuex ADD_HOLDY Error');
+      console.error(e);
     }
   }
 }

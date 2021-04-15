@@ -33,8 +33,8 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
-    // '~/plugins/fs.js',
   ],
+
   axios: {
     // extra config e.g
     baseURL: 'http://localhost:3000',
@@ -48,10 +48,9 @@ export default {
       }
     }
   },
-  serverMiddleware: [
-    // '~/serverMiddleware/testDB.js'
-    bodyparser.json(),
-    { path: '/apis', handler: '~/serverMiddleware/testDB.js' },
-  ],
 
+  serverMiddleware: [
+    bodyparser.json(),
+    { path: '/apis', handler: '~/serverMiddleware/holiday' },
+  ],
 }
