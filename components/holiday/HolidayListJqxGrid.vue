@@ -19,8 +19,8 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
-import {CHANGE} from "@/store/holiday";
+import {mapGetters} from "vuex"
+import {CHANGE} from "@/store/holiday"
 
 export default {
   data() {
@@ -29,12 +29,12 @@ export default {
       dataAdapter: new jqx.dataAdapter(this.source, {
         // load가 성공했을 때
         loadComplete: function (data) {
-          console.log("data is Loaded");
+          console.log("data is Loaded")
         },
 
         // load가 실패했을 때
         loadError: function (xhr, status, error) {
-          console.log("load error");
+          console.log("load error")
         }
       }),
 
@@ -51,38 +51,6 @@ export default {
         {datafield: 'lastModifiedAt', hidden: true},
         {datafield: 'lastModifiedBy', hidden: true},
       ]
-    }
-  },
-
-  methods: {
-    // 행을 클릭했을 때 이벤트. 행에 대한 수정 할 수 있는 창이 뜨게끔 한다. Modal사용
-    onClickRow(e) {
-      console.log(e.args.row.bounddata);
-    },
-
-    // JpxGrid change 이벤트
-    onChange() {
-      // ref로 지정해둔 Grid에서 rows를 가져온다.
-      const rows = this.$refs.holidayGrid.getrows();
-
-      // 가져온 rows로 대체한다.
-      this.$store.dispatch({
-        type: CHANGE,
-        values: rows,
-      })
-      /*
-      * 체크된 rows만을 찾아서 바꾼다 -> 탐색에 대한 시간이 걸림
-      * 그냥 전부다 교체해버린다 -> 탐색에 대한 시간이 걸리지 않지만,
-      * 데이터가 많아지면 어찌될지 모르겠음. 현재는 이를 선택.
-      */
-    },
-
-    // store와의 데이터를 다시 바인딩한다. watch.holidayList에서 쓰인다.
-    reBindData() {
-      // store에서 getters를 통해 holidayList를 호출한다.
-      this.source.localdata = this.$store.getters["holiday/holidayList"];
-      this.$refs.holidayGrid.updatebounddata('data');
-      this.$refs.holidayGrid.selectrow(0);
     }
   },
 
@@ -116,7 +84,41 @@ export default {
         {name: 'lastModifiedBy', type: 'string', map: '8'},
       ],
       datatype: 'array'
-    };
+    }
+  },
+
+  methods: {
+    // 행을 클릭했을 때 이벤트. 행에 대한 수정 할 수 있는 창이 뜨게끔 한다. Modal사용
+    onClickRow(e) {
+      this.$emit('onClickJqxGridRow', e.args.row.bounddata);
+    },
+
+    // JpxGrid change 이벤트
+    onChange() {
+      // ref로 지정해둔 Grid에서 rows를 가져온다.
+      const rows = this.$refs.holidayGrid.getrows()
+
+      // 가져온 rows로 대체한다.
+      this.$store.dispatch({
+        type: CHANGE,
+        values: rows,
+      })
+      /*
+      * 체크된 rows만을 찾아서 바꾼다 -> 탐색에 대한 시간이 걸림
+      * 그냥 전부다 교체해버린다 -> 탐색에 대한 시간이 걸리지 않지만,
+      * 데이터가 많아지면 어찌될지 모르겠음. 현재는 이를 선택.
+      */
+    },
+
+    // store와의 데이터를 다시 바인딩한다. watch.holidayList에서 쓰인다.
+    reBindData() {
+      // store에서 getters를 통해 holidayList를 호출한다.
+      this.source.localdata = this.$store.getters["holiday/holidayList"]
+      // 새로운 데이터로 업데이트한다.
+      this.$refs.holidayGrid.updatebounddata('data')
+      // 선택한 행을 초기화한다.(focus 초기화)
+      this.$refs.holidayGrid.selectrow(0)
+    }
   }
 }
 </script>

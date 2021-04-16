@@ -17,8 +17,11 @@
                 현재 날짜 : {{todayDate}}
               </div>
               <div>
-                <div>
+                <div v-if="isAdd">
                   기간 : <input v-model='inputBegDt' type="date">
+                </div>
+                <div v-else>
+                  기간 : {{formatDate(inputBegDt)}}
                 </div>
                 <div>
                   휴일 유형 :
@@ -31,7 +34,9 @@
                 휴일명 :
                 <textarea
                   class="textarea-holdy-nm"
+                  v-model="inputHoldyNm"
                   :inputHoldyNm="inputHoldyNm"
+                  :placeholder="inputHoldyNm"
                   @change="onChangeTextArea"
                 ></textarea>
               </div>
@@ -46,8 +51,13 @@
               <button class="modal-default-button" @click="onClickSaveButton">
                 저장
               </button>
-
             </slot>
+            <div v-if="!isAdd">
+              <p>등록자: {{editorState.createdBy}}</p>
+              <p>등록일: {{formatDateHour(editorState.createdAt)}}</p>
+              <p>수정자: {{editorState.lastModifiedBy}}</p>
+              <p>수정일: {{formatDateHour(editorState.lastModifiedAt)}}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -56,7 +66,8 @@
 </template>
 
 <script>
-import {ADD_HOLDY} from "../../store/holiday";
+import {mapGetters} from 'vuex';
+import {ADD_HOLDY, EDIT_HOLDY} from "../../store/holiday";
 
 export default {
   // 휴일에 대한 정보를 props로 받아오는 경우, 휴일을 수정하는 경우
@@ -64,6 +75,13 @@ export default {
   // props: ['inputBegDt'],
   data() {
     return {
+      // 현재 Modal의 목적. 수정인지 추가인지를 출력.
+      isAdd: true,
+
+      // 만약 수정모드라면 null이 아닌 특정값이 있다. 이 id값으로 수정요청을 보낸다.
+      isEditholdySn: null,
+
+      // input 데이터들
       inputBegDt: null,
       inputCreatedAt: null,
       inputHoldyTpCd: '일반휴일',
@@ -73,14 +91,40 @@ export default {
       todayDate: '',
     }
   },
+
+  // store eidtor에 들어있는 상태값들을 받는다.
+  computed: {
+    ...mapGetters({
+      editorState: 'editor/editInfo',
+    }),
+  },
+
+  created() {
+    // 오늘의 날짜를 만든다.
+    this.todayDate = this.formatDate(new Date());
+
+    // 만약 store에서 editor 데이터를 가져왔다면, data값들을 모두 해당 상태값으로 바꾼다.
+    if (this.editorState.begDt !== null) {
+      this.inputBegDt = this.editorState.begDt
+      this.inputHoldyTpCd = this.editorState.holdyTpCd
+      this.inputCreatedAt = this.editorState.createdAt
+      this.inputHoldyNm = this.editorState.holdyNm
+      this.isEditholdySn = this.editorState.holdySn
+      // 이 때 수정모드이므로 isAdd 데이터는 false이다.
+      this.isAdd = false;
+    }
+  },
+
   methods: {
     // modal 닫는 이벤트
     onClickCloseModal() {
+      // 부모컴포넌트로부터 받은 이벤트 실행
       this.$emit('onClickCloseModal');
     },
 
     // textArea 변경 이벤트
     onChangeTextArea(e) {
+      // v-model시 한글입력은 버그 발생. v-bind와 v-on을 직접 지정
       this.inputHoldyNm = e.target.value;
     },
 
@@ -91,26 +135,54 @@ export default {
       // 스토어 액션으로 new date(등록일), begDt, holdyNm, holdyTpCd, 넘긴다.
       else {
         try {
-          const [error, message] =
+          // 등록모드 일 때
+          if (this.isAdd) {
+            // 서버로 요청을 보내 결과값을 받는다.
+            const [error, message] =
+              await this.$store.dispatch({
+                type: ADD_HOLDY,
+                createdAt: new Date(),
+                begDt: this.inputBegDt,
+                holdyNm: this.inputHoldyNm,
+                holdyTpCd: this.inputHoldyTpCd,
+              });
+
+            // 만약 error라면(true) 해당 메시지를 띄운다.
+            if (error) alert(message);
+
+            // 정상적으로 처리가 되었다면 Modal을 닫는다.
+            else this.onClickCloseModal();
+          }
+          // 수정모드 일 때
+          else if (!this.isAdd) {
+            //서버로부터 결과값을 받는다.
+            const [error, message] =
             await this.$store.dispatch({
-              type: ADD_HOLDY,
-              createdAt: new Date(),
-              begDt: this.inputBegDt,
+              type: EDIT_HOLDY,
               holdyNm: this.inputHoldyNm,
               holdyTpCd: this.inputHoldyTpCd,
+              holdySn: this.isEditholdySn
             });
-          if (error) alert(message);
-          else this.onClickCloseModal();
+            // 위와 동일
+            if(error) alert(message);
+            else this.onClickCloseModal();
+          }
         } catch (e) {
           console.log('Modal.vue - onClickSaveButton() 에러')
           console.error(e);
         }
       }
+    },
+
+    // Date 형식을 YYYY-MM-DD 형식으로 출력한다.
+    formatDate(date) {
+      return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    },
+
+    // Date 형식을 YYYY-MM-DD MM:SS
+    formatDateHour(date) {
+      return this.formatDate(date) + ' ' + date.getMinutes() + ':' + date.getSeconds();
     }
-  },
-  created() {
-    const date = new Date();
-    this.todayDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
   }
 }
 </script>

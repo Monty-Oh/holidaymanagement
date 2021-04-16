@@ -27,6 +27,7 @@ export const AddHoldy = function (holidayList, {begDt, holdyTpCd, holdyNm, creat
   return result;
 }
 
+
 // 일반휴일일 경우 체크함. 비어있는 일반휴일이 있는지, 이미 있는지..
 function checkEmptyNormalHoliday(holidayList, begDt, holdyNm) {
   // 내보낼 새로운 HolidayList.
@@ -69,4 +70,86 @@ function checkEmptyDeliverHoliday(holidayList, begDt) {
 
   // 모두 거치지 않았다면. 등록되어 있는 일반휴일이 없는 것이다.
   return [202, '먼저, 해당날짜로 등록된 일반휴일이 있어야합니다.']
+}
+
+
+// 수정 로직
+// 1. 만약 찾은 holdySn의 holdyTpCd 값이 다르면 복잡해진다.
+// 1-1. 일반휴일 -> 배송휴일 일 경우, 못바꾼다.
+// 1-2. 배송휴일 -> 일반휴일 일 경우, 기존 일반휴일을 찾아 holdyNm과 modifiedAt을 바꾼다.
+// 2. 만약 holdySn와 holdyTpCd의 값이 같다면, modifedAt, holdyNm만 바꿔준다.
+export function EditHolidayList(holidayList, lastModifiedBy, holdyNm, holdySn, holdyTpCd) {
+  let target = null;
+  // 바꿔야할 타겟을 탐색.
+  for(let i = 0; i < holidayList.length; i++) {
+    if(holidayList[i].holdySn === holdySn) {
+      target = holidayList[i];
+      break;
+    }
+  }
+
+  // 만약 휴일 유형 변경이 없다면 그냥 바꿔달라는대로 바꾸면 된다.
+  if(target.holdyTpCd === holdyTpCd) {
+    return EditHolidayList_SameHoldyTpCd(holidayList, holdySn, holdyNm)
+  }
+  // 만약 다른 경우
+  else {
+    // 일반 -> 배송의 경우 막는다.
+    if(holdyTpCd === '배송휴일')
+      return [202, '일반휴일에서 배송휴일로 변경은 불가합니다. 일반 휴일을 따로 추가해주세요'];
+    // 배송 -> 일반
+    else
+      return EditHolidayList_ChangeDeliverToNormal(holidayList, holdySn, holdyNm, target.begDt)
+  }
+}
+
+// 만약 배송 -> 일반의 경우
+function EditHolidayList_ChangeDeliverToNormal(holidayList, holdySn, holdyNm, begDt) {
+  // 1. 일반배송을 찾는다. ''일때와 데이터값이 있을떄로 나뉨.
+  // 1-1. ''일때 덮어씌운다. 기존은 삭제
+  // 1-2. ''이 아니라면 return error
+  let normal = searchNormalHoldyByBegDt(holidayList, begDt);
+  if(normal[1].holdyNm === '') {
+    let nextHolidayList = holidayList.map((item) => item.holdySn !== holdySn);
+    nextHolidayList = nextHolidayList.map((item) => {
+      if(normal[1].begDt === begDt) {
+        return {
+          ...normal[1],
+          holdySn,
+          holdyNm,
+          lastModifiedAt: new Date(),
+          lastModifiedBy: 'monty_fix_test'
+        }
+      }
+      else return item;
+    });
+    return [200, nextHolidayList];
+  }
+  else {
+    return [202, '이미 일반 휴일이 존재합니다.'];
+  }
+}
+
+// 해당 holidayList 안에 begDt가 같은 일반 휴일이 있는지 체크. 있으면 [true, 해당 데이터]
+// 없다면 [false]
+function searchNormalHoldyByBegDt(holidayList, begDt) {
+  for(let i = 0; i < holidayList.length; i++) {
+    if(holidayList[i].begDt === begDt && holidayList[i].holdyTpCd === '일반휴일')
+      return [true, holidayList[i]];
+  }
+  return [false]
+}
+
+function EditHolidayList_SameHoldyTpCd(holidayList, holdySn, holdyNm) {
+    const nextHolidayList = holidayList.map((holdy) => {
+      if(holdy.holdySn === holdySn)
+        return {
+          ...holdy,
+          holdyNm,
+          lastModifiedAt: new Date(),
+          lastModifiedBy: 'monty_fix_test',
+        }
+      else return holdy;
+    });
+    return [200, nextHolidayList];
 }
