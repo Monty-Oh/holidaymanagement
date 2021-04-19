@@ -1,4 +1,5 @@
 import {CHANGE_HOLIDAY_LIST} from './mutations';
+import {loadDBJson} from './lib'
 
 export const SEARCH = 'SEARCH';
 export const INIT = 'INIT';
@@ -6,8 +7,6 @@ export const CHANGE = 'CHANGE';
 export const DELETE = 'DELETE';
 export const ADD_HOLDY = 'ADD_HOLDY';
 export const EDIT_HOLDY = 'EDIT_HOLDY';
-
-import { loadDBJson  } from './lib'
 
 // 비동기 작업 actions
 const actions = {
@@ -18,15 +17,16 @@ const actions = {
       // 비동기작업!! 작업에 필요한 기능들은 모두 api로 호출
 
       // 서버로부터 데이터를 전송 요청함. 응답의 data에 있는 holidatyList를 꺼낸다.
-      const result = (await this.$axios.get('/apis/holdy')).data.holidayList;
+      // const result = (await this.$axios.get('/apis/holdy')).data.holidayList;
 
       // 필터링 작업을 한다.
-      let nextHolidayList = loadDBJson(result, this.state.search);
+      // let nextHolidayList = loadDBJson(result, this.state.search);
 
+      const result = await this.$axios.get(`/apis/holidaylist?startDate=${this.state.search.startDate}&endDate=${this.state.search.endDate}&normalHoliday=${this.state.search.normalHoliday}&deliverHoliday=${this.state.search.deliverHoliday}`);
       //가져온 데이터를 바로 store 의 state 에 저장한다.
       context.commit({
         type: CHANGE_HOLIDAY_LIST,
-        result: nextHolidayList,
+        result: result.data.holidayList,
       });
 
     } catch (e) {

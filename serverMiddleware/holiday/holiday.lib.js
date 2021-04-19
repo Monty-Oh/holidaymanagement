@@ -1,4 +1,6 @@
 // testDB.json 데이터 작업 라이브러리. [상태코드, 데이터] 값으로 통일함.
+// add, delete, update에 관한 데이터들
+
 
 // add 작업을 하고 완료된 데이터를 return 한다.
 export const AddHoldy = function (holidayList, {begDt, holdyTpCd, holdyNm, createdAt, createdBy}) {

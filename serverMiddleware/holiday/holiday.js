@@ -1,5 +1,10 @@
 import express from 'express';
+import querystring from 'querystring';
+
+// 추가, 수정을 위한 라이브러리 호출
 import {AddHoldy, EditHolidayList} from './holiday.lib';
+// 검색을 위한 라이브러리 호출
+import {filterData} from './holiday.lib.search';
 
 const fs = require('fs');
 const router = express.Router();
@@ -13,6 +18,22 @@ router.use((req, res, next) => {
   res.req = req;
   next();
 });
+
+// get 수정중... 테스트용 라우터
+router.get('/holidaylist', async (req, res) => {
+  // 검색 조건을 설정하기 위해 쿼리스트링을 이용하여 쿼리 분석
+  const querys = querystring.parse(req.url.split('/holidaylist?').join(''));
+  // 검색을 하게 될 데이터를 불러온다. 불러오고, JSON형식으로 바꾸고, holidayList를 가져온다.
+  const data = JSON.parse(await fs.readFileSync('testDB.json', (err) => {
+    if(err) console.log(err);
+  }))['holidayList'];
+  const result = {holidayList: filterData(data, querys)};
+  return res.send(result);
+
+
+
+  // return res.send(JSON.parse({holidayList: result}))
+})
 
 // delivered new data. save new data
 router.post('/holdy', async (req, res) => {

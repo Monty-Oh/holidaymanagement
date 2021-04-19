@@ -21,7 +21,7 @@
           <div class="input-box">
             <button @click="onClickEveryHoliday">전체</button>
             <input type="checkbox" v-model="normalHoliday" @change="onChange('normalHoliday')"> 일반휴일
-            <input type="checkbox" v-model="transferHoliday" @change="onChange('transferHoliday')"> 배송휴일
+            <input type="checkbox" v-model="deliverHoliday" @change="onChange('deliverHoliday')"> 배송휴일
           </div>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default {
       startDate: null,
       endDate: null,
       normalHoliday: false,
-      transferHoliday: false,
+      deliverHoliday: false,
     }
   },
 
@@ -68,9 +68,9 @@ export default {
     // 전체 버튼 클릭 이벤트
     onClickEveryHoliday() {
       // 전체를 클릭하면 모두 true로 바꾸고 이를 반영한다.
-      this.transferHoliday = true;
+      this.deliverHoliday = true;
       this.normalHoliday = true;
-      this.onChange('transferHoliday');
+      this.onChange('deliverHoliday');
       this.onChange('normalHoliday');
     },
 
@@ -98,7 +98,7 @@ export default {
       this.startDate = null;
       this.endDate = null;
       this.normalHoliday = false;
-      this.transferHoliday = false;
+      this.deliverHoliday = false;
     }
   }
 }

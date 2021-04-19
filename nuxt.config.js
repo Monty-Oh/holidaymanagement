@@ -51,6 +51,7 @@ export default {
 
   serverMiddleware: [
     bodyparser.json(),
+
     { path: '/apis', handler: '~/serverMiddleware/holiday' },
   ],
 }
