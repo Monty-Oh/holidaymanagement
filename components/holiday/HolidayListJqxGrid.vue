@@ -68,8 +68,12 @@ export default {
   },
 
   beforeCreate() {
+    // JqxGrid 설정
     this.source = {
+      // 초기값 데이터. 조회 버튼을 누르기 전까지는 ㅣㅂ어있다.
       localdata: [],
+
+      // 필드에 대한 정보
       datafields: [
         {name: 'check', type: "bool", map: '0'},
         {name: 'begDt', type: 'date', map: '1'},
@@ -78,7 +82,7 @@ export default {
         {name: 'createdAt', type: 'date', map: '4'},
         {name: 'holdyTpCd', type: 'string', map: '5'},
 
-        // 숨겨진 값들
+        // 숨겨진 값들. 갖고있다가 나중에 CRUD 작업때 쓴다.
         {name: 'holdySn', type: 'number', map: '6'},
         {name: 'lastModifiedAt', type: 'date', map: '7'},
         {name: 'lastModifiedBy', type: 'string', map: '8'},
@@ -106,7 +110,7 @@ export default {
       /*
       * 체크된 rows만을 찾아서 바꾼다 -> 탐색에 대한 시간이 걸림
       * 그냥 전부다 교체해버린다 -> 탐색에 대한 시간이 걸리지 않지만,
-      * 데이터가 많아지면 어찌될지 모르겠음. 현재는 이를 선택.
+      * 데이터가 많아지면 어찌될지 모르겠음. 현재는 2번을 선택.
       */
     },
 
@@ -122,7 +126,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

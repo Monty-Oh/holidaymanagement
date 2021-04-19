@@ -14,6 +14,7 @@ export default {
     onClickSearch() {
       this.$emit('onClickSearch');
     },
+    // 마찬가지로 부모 컴포넌트로부터 받은 이벤트 발생
     onClickInit() {
       this.$emit('onClickInit');
     }

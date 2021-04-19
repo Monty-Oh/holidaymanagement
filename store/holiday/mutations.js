@@ -21,9 +21,6 @@ const mutations = {
       }
     });
   },
-  [SEARCH_HOLIDAY_LIST](state, {result}) {
-
-  },
 }
 
 export default mutations;

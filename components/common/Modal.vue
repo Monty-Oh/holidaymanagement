@@ -181,6 +181,7 @@ export default {
 
     // Date 형식을 YYYY-MM-DD MM:SS
     formatDateHour(date) {
+      // 함수 재활용해서 불러온 다음 뒤에 MM:SS 만 추가적으로 붙여준다.
       return this.formatDate(date) + ' ' + date.getMinutes() + ':' + date.getSeconds();
     }
   }

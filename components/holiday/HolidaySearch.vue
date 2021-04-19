@@ -53,17 +53,21 @@ export default {
       transferHoliday: false,
     }
   },
+
   methods: {
+    // store의 search 모듈의 해당 target의 키값에 value를 넣는다.
     onChange(target) {
       this.$store.dispatch({
         type: searchActions.CHANGE_VALUE,
         target,
+        // data 안에 들어있는 상태값을 키값으로 호출
         value: this[target],
       })
     },
 
     // 전체 버튼 클릭 이벤트
     onClickEveryHoliday() {
+      // 전체를 클릭하면 모두 true로 바꾸고 이를 반영한다.
       this.transferHoliday = true;
       this.normalHoliday = true;
       this.onChange('transferHoliday');
@@ -78,13 +82,19 @@ export default {
       })
     },
 
+    // input버튼
     onClickInit() {
+      // holidayList에 담겨있는 리스트들을 모두 비워낸다.
       this.$store.dispatch({
         type: holidayActions.INIT,
       });
+
+      // search에 담겨있는 상태값들을 모두 비워낸다.
       this.$store.dispatch({
         type: searchActions.INIT,
       })
+
+      // 현재 컴포넌트가 가지고 있는 상태값들도 모두 초기화시킨다.
       this.startDate = null;
       this.endDate = null;
       this.normalHoliday = false;

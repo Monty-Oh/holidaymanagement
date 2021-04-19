@@ -5,7 +5,9 @@ export const INIT = 'INIT';
 export const CHANGE = 'CHANGE';
 export const DELETE = 'DELETE';
 export const ADD_HOLDY = 'ADD_HOLDY';
-export const EDIT_HOLDY = 'EDIT_HOLDY'
+export const EDIT_HOLDY = 'EDIT_HOLDY';
+
+import { loadDBJson  } from './lib'
 
 // 비동기 작업 actions
 const actions = {
@@ -18,10 +20,13 @@ const actions = {
       // 서버로부터 데이터를 전송 요청함. 응답의 data에 있는 holidatyList를 꺼낸다.
       const result = (await this.$axios.get('/apis/holdy')).data.holidayList;
 
+      // 필터링 작업을 한다.
+      let nextHolidayList = loadDBJson(result, this.state.search);
+
       //가져온 데이터를 바로 store 의 state 에 저장한다.
       context.commit({
         type: CHANGE_HOLIDAY_LIST,
-        result,
+        result: nextHolidayList,
       });
 
     } catch (e) {

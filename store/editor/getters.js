@@ -1,6 +1,5 @@
 const getters = {
-  // 객체 형태의 holiday를 배열로 바꿔서 return해야함.
-
+  // editor에 관한 상태정보들을 리턴
   editInfo: (state) => {
     return state;
   }
