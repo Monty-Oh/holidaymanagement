@@ -1,26 +1,24 @@
 <template>
   <div class="container">
     <div>
-      <Logo />
+      <img src="/monty.png" />
       <h1 class="title">
-        holiday
+        휴일 관리 시스템
       </h1>
       <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
+        <nuxt-link
+          to="/holiday"
           class="button--green"
         >
-          Documentation
-        </a>
+          Holiday Page
+        </nuxt-link>
         <a
-          href="https://github.com/nuxt/nuxt.js"
+          href="https://github.com/Monty-Oh/holidaymanagement"
           target="_blank"
           rel="noopener noreferrer"
           class="button--grey"
         >
-          GitHub
+          Project GitHub
         </a>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import {CHANGE_HOLIDAY_LIST} from './mutations';
-import {loadDBJson} from './lib'
 
 export const SEARCH = 'SEARCH';
 export const INIT = 'INIT';
