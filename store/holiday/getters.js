@@ -16,7 +16,7 @@ const getters = {
         holiday.lastModifiedAt,
         holiday.lastModifiedBy,
       ]
-    });
+    }).sort((a, b) => a[1] - b[1]);
   },
 }
 

@@ -22,7 +22,7 @@ const actions = {
       // 필터링 작업을 한다.
       // let nextHolidayList = loadDBJson(result, this.state.search);
 
-      const result = await this.$axios.get(`/apis/holidaylist?startDate=${this.state.search.startDate}&endDate=${this.state.search.endDate}&normalHoliday=${this.state.search.normalHoliday}&deliverHoliday=${this.state.search.deliverHoliday}`);
+      const result = await this.$axios.get(`/apis/holdy?startDate=${this.state.search.startDate}&endDate=${this.state.search.endDate}&normalHoliday=${this.state.search.normalHoliday}&deliverHoliday=${this.state.search.deliverHoliday}`);
       //가져온 데이터를 바로 store 의 state 에 저장한다.
       context.commit({
         type: CHANGE_HOLIDAY_LIST,
@@ -98,12 +98,12 @@ const actions = {
     })
 
     // 완료 됐다면 새로운 데이터를 다시 받아와서 그대로 저장한다.
-    const result = (await this.$axios.get('/apis/holdy')).data.holidayList;
+    const result = await this.$axios.get(`/apis/holdy?startDate=${this.state.search.startDate}&endDate=${this.state.search.endDate}&normalHoliday=${this.state.search.normalHoliday}&deliverHoliday=${this.state.search.deliverHoliday}`);
 
     // 받아온 데이터로 store에 저장한다.
     context.commit({
       type: CHANGE_HOLIDAY_LIST,
-      result,
+      result: result.data.holidayList
     });
   },
 
@@ -124,8 +124,10 @@ const actions = {
       // 이미 일반 배송 휴일이 있을 때와 같은 에러일 경우 status 202를 받는다.
       if (result.status === 202)
         return [true, result.data];
-      else {
-        // 문제가 발생하지 않았다면, 완료된 데이터를 전달받고 store에 저장한다.
+      else if(result.status === 200) {
+
+        // 문제가 발생하지 않았다면, 조건에 맞는 조회를 다시 요청한다.
+        const result = await this.$axios.get(`/apis/holdy?startDate=${this.state.search.startDate}&endDate=${this.state.search.endDate}&normalHoliday=${this.state.search.normalHoliday}&deliverHoliday=${this.state.search.deliverHoliday}`);
         context.commit({
           type: CHANGE_HOLIDAY_LIST,
           result: result.data.holidayList,
@@ -143,6 +145,7 @@ const actions = {
   async [EDIT_HOLDY](context, {holdyNm, holdySn, holdyTpCd}) {
     // 테스트용
     const lastModifiedBy = 'monty_fix_test';
+    console.log('here');
     try {
       // 전달받은 데이터들로 수정 요청과 함께 데이터를 보낸다.
       const result = await this.$axios.put('/apis/holdy/item', {
@@ -158,8 +161,10 @@ const actions = {
       if (result.status === 202)
         return [true, result.data];
 
-      else {
+      else if(result.status === 200) {
         // 제대로 처리됐다면 store에 저장
+        const result = await this.$axios.get(`/apis/holdy?startDate=${this.state.search.startDate}&endDate=${this.state.search.endDate}&normalHoliday=${this.state.search.normalHoliday}&deliverHoliday=${this.state.search.deliverHoliday}`);
+
         context.commit({
           type: CHANGE_HOLIDAY_LIST,
           result: result.data.holidayList,

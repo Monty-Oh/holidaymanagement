@@ -14,6 +14,7 @@
         @celldoubleclick="onClickRow"
         ref="holidayGrid"
       />
+      <!--      :sortable="true"-->
     </client-only>
   </div>
 </template>

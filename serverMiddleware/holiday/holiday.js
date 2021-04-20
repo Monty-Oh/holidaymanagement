@@ -20,9 +20,9 @@ router.use((req, res, next) => {
 });
 
 // get 수정중... 테스트용 라우터
-router.get('/holidaylist', async (req, res) => {
+router.get('/holdy', async (req, res) => {
   // 검색 조건을 설정하기 위해 쿼리스트링을 이용하여 쿼리 분석
-  const querys = querystring.parse(req.url.split('/holidaylist?').join(''));
+  const querys = querystring.parse(req.url.split('/holdy?').join(''));
   // 검색을 하게 될 데이터를 불러온다. 불러오고, JSON형식으로 바꾸고, holidayList를 가져온다.
   const data = JSON.parse(await fs.readFileSync('testDB.json', (err) => {
     if(err) console.log(err);
@@ -48,14 +48,14 @@ router.post('/holdy', async (req, res) => {
 });
 
 // get data and send(data)
-router.get('/holdy', async (req, res) => {
-  try {
-    const data = await fs.readFileSync('testDB.json');
-    return res.send(JSON.parse(data))
-  } catch (e) {
-    console.error(e);
-  }
-})
+// router.get('/holdy', async (req, res) => {
+//   try {
+//     const data = await fs.readFileSync('testDB.json');
+//     return res.send(JSON.parse(data))
+//   } catch (e) {
+//     console.error(e);
+//   }
+// })
 
 // 새로운 요소 생성
 router.post('/holdy/item', async (req, res) => {
@@ -80,7 +80,8 @@ router.post('/holdy/item', async (req, res) => {
       });
 
       // 다시 새롭게 만들어진 json파일 출력
-      res.redirect('/apis/holdy');
+      res.status(200);
+      res.send('add success');
     }
   } catch (e) {
     console.error(e);
@@ -104,8 +105,8 @@ router.put('/holdy/item', async (req, res) => {
         if (err) console.error(err);
       });
       // 다시 새롭게 만들어진 json파일 출력
-      const data = await fs.readFileSync('testDB.json');
-      return res.send(JSON.parse(data));
+      res.status(200);
+      res.send('edit success');
     }
   } catch (e) {
     console.error(e);
